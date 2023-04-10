@@ -11,6 +11,9 @@ public class ScheduleHelper
         ScheduleType.Monthly => "Month(s)",
         ScheduleType.Daily  => "Day(s)",
         ScheduleType.Weekly => "Week(s)",
+        ScheduleType.First => "First",
+        ScheduleType.Last => "Last",
+        ScheduleType.Nth => "nth",
         ScheduleType.Custom => "Custom",
         _ => throw new ArgumentOutOfRangeException(nameof(scheduleType), $"Unexpected scheduleType value: {scheduleType}")
     };
