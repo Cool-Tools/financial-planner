@@ -1,12 +1,15 @@
 ﻿@page "/Schedules"
 @using FP.PWA.Components
 @using Schedule =  FP.Models.Scheduling.Schedule
+@using FP.Models.Enumerations
+@using MudBlazor.Extensions
 
 <MudPopover></MudPopover>
 
 <h3>Schedule</h3>
 <DataForm @ref="_dataFormDialog" Model="_schedule" IconUrl="/favicon.png" SubmitEventCallback="@HandleValidSubmit" CloseEventCallback="@DataFormDialog_OnDialogClose">
     <MudTextField Label="Date" @bind-Value="_schedule!.Date" For="@(() => _schedule!.Date)"></MudTextField>
+    <MudAutocomplete T="ScheduleType"  Label="Repeats" @bind-Value="_schedule!.Type" SearchFunc="@Search1" For="@(() => _schedule!.Type)"></MudAutocomplete>
     <MudNumericField Label="Every" @bind-Value="_schedule!.Every" For="@(() => _schedule!.Every)"></MudNumericField>
 </DataForm>
 
@@ -16,11 +19,23 @@
     private Schedule? _schedule;
     private DataForm? _dataFormDialog;
 
+    private string[] types = ScheduleType.GetValuesAsUnderlyingType<ScheduleType>().As<string[]>();
     private async Task HandleNewSchedule()
     {
         _schedule = new Schedule();
         StateHasChanged();
         await _dataFormDialog!.Show(false);
+    }
+    
+    private async Task<IEnumerable<ScheduleType>> Search1(string value)
+    {
+    // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5);
+
+    // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return types;
+        return types.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
 
     private async void DataFormDialog_OnDialogClose()
