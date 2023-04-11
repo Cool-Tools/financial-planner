@@ -1,0 +1,79 @@
+@using FP.Models.Scheduling
+@using System.ComponentModel
+@* @inject IToastService ToastService *@
+@inject NavigationManager NavigationManager
+
+@if (ShowDialog)
+{
+    <div class="modal fade show d-block" id="dataDialog" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content dlg-modal">
+                <div class="modal-header">
+                    <button type="button" class="btn btn-light btn-circle btn-lg" @onclick="@(() => Close())" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="oi oi-x"></span>
+                    </button>
+                    <MudImage Src="@IconUrl" Alt="Image for user" onerror="this.onerror = null; this.src='/no-photo.jpeg'" Elevation="25" Class="rounded-circle" Width="40" Height="40"/>
+                </div>
+                <EditForm Model="@Model" OnValidSubmit="@HandleValidSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="modal-body">
+                        @ChildContent
+                    </div>
+                    <div class="modal-footer">
+                        @if (EditMode == false)
+                        {
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        }
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+
+}
+@code {
+    [Parameter] public object? Model { get; set; }
+    [Parameter] public string? IconUrl { get; set; }
+    [Parameter]
+    public EventCallback<bool> SubmitEventCallback {  get;set; }
+    [Parameter]
+    public EventCallback<bool> CloseEventCallback {  get;set; }
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+    
+    public bool EditMode { get; set; }
+    public bool ShowDialog { get; set; }
+
+    public async Task Close()
+    {
+        ShowDialog = false;
+        await CloseEventCallback.InvokeAsync(true);
+        StateHasChanged();
+    }
+
+    public async Task Show(bool editMode = true)
+    {
+        EditMode = editMode;
+        ShowDialog = true;
+        StateHasChanged();
+    }
+
+    public async Task Refresh()
+    {
+        StateHasChanged();
+    }
+    
+    private async Task HandleValidSubmit()
+    {
+        ShowDialog = false;
+        System.Console.WriteLine("CHILD::HandleValidSubmit called");
+        await SubmitEventCallback.InvokeAsync(true);
+        StateHasChanged();
+    }
+}

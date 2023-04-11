@@ -1,0 +1,7 @@
+.dlg-modal {
+    border-color: var(--font-color);
+    border-width: medium;
+    border-radius: 1rem;
+    margin: 1%;
+    width: 99%;
+}

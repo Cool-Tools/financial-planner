@@ -1,0 +1,35 @@
+﻿@page "/Schedules"
+@using FP.PWA.Components
+@using Schedule =  FP.Models.Scheduling.Schedule
+
+<MudPopover></MudPopover>
+
+<h3>Schedule</h3>
+<DataForm @ref="_dataFormDialog" Model="_schedule" IconUrl="/favicon.png" SubmitEventCallback="@HandleValidSubmit" CloseEventCallback="@DataFormDialog_OnDialogClose">
+    <MudTextField Label="Date" @bind-Value="_schedule!.Date" For="@(() => _schedule!.Date)"></MudTextField>
+    <MudNumericField Label="Every" @bind-Value="_schedule!.Every" For="@(() => _schedule!.Every)"></MudNumericField>
+</DataForm>
+
+<MudButton OnClick="HandleNewSchedule">Test</MudButton>
+
+@code {
+    private Schedule? _schedule;
+    private DataForm? _dataFormDialog;
+
+    private async Task HandleNewSchedule()
+    {
+        _schedule = new Schedule();
+        StateHasChanged();
+        await _dataFormDialog!.Show(false);
+    }
+
+    private async void DataFormDialog_OnDialogClose()
+    {
+    }
+
+    private Task HandleValidSubmit()
+    {
+        throw new NotImplementedException();
+    }
+
+}
