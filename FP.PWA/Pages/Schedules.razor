@@ -19,7 +19,7 @@
     private Schedule? _schedule;
     private DataForm? _dataFormDialog;
 
-    private string[] types = ScheduleType.GetValuesAsUnderlyingType<ScheduleType>().As<string[]>();
+    private string[] _types = ScheduleType.GetValuesAsUnderlyingType<ScheduleType>().As<string[]>();
     private async Task HandleNewSchedule()
     {
         _schedule = new Schedule();
@@ -34,8 +34,8 @@
 
     // if text is null or empty, show complete list
         if (string.IsNullOrEmpty(value))
-            return types;
-        return types.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+            return ScheduleType.GetValuesAsUnderlyingType<ScheduleType>().ToList<ScheduleType>();
+        return _types.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase)).Select(y => ScheduleType.Parse<ScheduleType>(y));
     }
 
     private async void DataFormDialog_OnDialogClose()
