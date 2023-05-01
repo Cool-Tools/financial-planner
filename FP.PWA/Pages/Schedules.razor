@@ -2,6 +2,7 @@
 @using FP.PWA.Components
 @using Schedule =  FP.Models.Scheduling.Schedule
 @using FP.Models.Enumerations
+@using FP.Models.StaticHelpers
 @using MudBlazor.Extensions
 @using MudBlazor.Components
 
@@ -9,61 +10,59 @@
 
 <h3>Schedule</h3>
 <DataForm @ref="_dataFormDialog" Model="_schedule" IconUrl="/favicon.png" SubmitEventCallback="@HandleValidSubmit" CloseEventCallback="@DataFormDialog_OnDialogClose">
-    @* <MudTextField Label="Date" @bind-Value="_schedule!.Date" For="@(() => _schedule!.Date)"></MudTextField> *@
-    @* <MudAutocomplete T="string"  Label="Repeats" @bind-Value="_scheduleType" SearchFunc="@Search1" For="@(() => _scheduleType)"></MudAutocomplete> *@
-    <MudDatePicker Label="Start Date" @bind-Date="_schedule!.Date" For="@(() => _schedule!.Date)" />
     <MudSelect @bind-Value="_schedule!.Type" Label="Select occurence" HelperText="Frequency">
         @foreach (ScheduleType item in Enum.GetValues<ScheduleType>())
         {
             <MudSelectItem Value="@item">@item</MudSelectItem>
         }
     </MudSelect>
-    <MudNumericField Label="Every" @bind-Value="_schedule!.Every" For="@(() => _schedule!.Every)"></MudNumericField>
-    @if (_schedule!.Type == ScheduleType.Last || _schedule!.Type == ScheduleType.First || _schedule!.Type == ScheduleType.Nth)
+    @if (_schedule!.Type != ScheduleType.Nth && _schedule!.Type != ScheduleType.Once && _schedule!.Type != ScheduleType.Custom)
     {
-        <p>First / Last / Nth</p>
-        @switch (_schedule!.Type)
-        {
-            case ScheduleType.First:
-                <p>First</p>
-                break;
-            case ScheduleType.Last:
-                <p>Last</p>
-                break;
-            default:
-                <MudSelect T="int" Label="nth" bind-Value="_schedule.Nth">
-                    <MudSelectItem T="int" Value="2">2nd</MudSelectItem>
-                    <MudSelectItem T="int" Value="3">3rd</MudSelectItem>
-                    <MudSelectItem T="int" Value="4">4th</MudSelectItem>
-                </MudSelect>
-                break;
-        }
-        <MudSelect T="string" Label="Day of the week" MultiSelection="false" @bind-Value="value" @bind-SelectedValues="_schedule.DaysOfTheWeek" >
+        <MudNumericField Label="Every" @bind-Value="_schedule!.Every" For="@(() => _schedule!.Every)"></MudNumericField>
+        <span>&nbsp;</span>
+        @_schedule!.Type.ToSchedulePrompt()
+    }
+    @if (_schedule!.Type == ScheduleType.Nth)
+    {
+        <MudSelect T="int" Label="nth" bind-Value="_schedule.Nth">
+            <MudSelectItem T="int" Value="0">1st</MudSelectItem>
+            <MudSelectItem T="int" Value="2">2nd</MudSelectItem>
+            <MudSelectItem T="int" Value="3">3rd</MudSelectItem>
+            <MudSelectItem T="int" Value="4">4th</MudSelectItem>
+            <MudSelectItem T="int" Value="-1">Last</MudSelectItem>
+        </MudSelect>
+        <MudSelect T="string" Label="on" MultiSelection="false" @bind-Value="value" @bind-SelectedValues="_schedule.DaysOfTheWeek" >
+            @foreach (var day in _daysOfTheWeek)
+            {
+                <MudSelectItem T="string" Value="@day">@day</MudSelectItem>
+            }
+        </MudSelect>
+        @("of the month")
+    }
+    @if (_schedule!.Type == ScheduleType.Weekly)
+    {
+        <MudSelect T="string" Label="on" MultiSelection="true" @bind-Value="value" @bind-SelectedValues="_schedule.DaysOfTheWeek" SelectAll="true">
             @foreach (var day in _daysOfTheWeek)
             {
                 <MudSelectItem T="string" Value="@day">@day</MudSelectItem>
             }
         </MudSelect>
     }
-    @if (_schedule!.Type == ScheduleType.Weekly || _schedule!.Type == ScheduleType.Monthly)
+    @* @if (_schedule!.Type == ScheduleType.Annually) *@
+    @* { *@
+    @*     <p>on</p> *@
+    @*     <MudSelect T="string" Label="Months of the year" MultiSelection="true" @bind-Value="value" @bind-SelectedValues="_schedule.MonthsOfTheYear" SelectAll="true"> *@
+    @*         @foreach (var month in _monthsOfTheYear) *@
+    @*         { *@
+    @*             <MudSelectItem T="string" Value="@month">@month</MudSelectItem> *@
+    @*         } *@
+    @*     </MudSelect> *@
+    @* } *@
+    <MudDatePicker Label="Start Date" @bind-Date="_schedule!.StartDate" For="@(() => _schedule!.StartDate)" />
+    @if (_schedule!.Type != ScheduleType.Once)
     {
-        <p>Weekly / Monthly</p>
-        <MudSelect T="string" Label="Days of the week" MultiSelection="true" @bind-Value="value" @bind-SelectedValues="_schedule.DaysOfTheWeek" SelectAll="true">
-            @foreach (var day in _daysOfTheWeek)
-            {
-                <MudSelectItem T="string" Value="@day">@day</MudSelectItem>
-            }
-        </MudSelect>
-    }
-    @if (_schedule!.Type == ScheduleType.Annually)
-    {
-        <p>Annually</p>
-        <MudSelect T="string" Label="Months of the year" MultiSelection="true" @bind-Value="value" @bind-SelectedValues="_schedule.MonthsOfTheYear" SelectAll="true">
-            @foreach (var month in _monthsOfTheYear)
-            {
-                <MudSelectItem T="string" Value="@month">@month</MudSelectItem>
-            }
-        </MudSelect>
+        <MudCheckBox @bind-Checked="@_hasEndDate" Style="width: 10%"></MudCheckBox>
+        <MudDatePicker Disabled="@(!_hasEndDate)" Label="End Date" @bind-Date="_schedule!.EndDate" For="@(() => _schedule!.EndDate)"/>
     }
 </DataForm>
 
@@ -71,20 +70,15 @@
 
 @code {
     private Schedule? _schedule;
+    private bool _hasEndDate = false;
     private DataForm? _dataFormDialog;
     private string value { get; set; } = "Nothing selected";
     private string[] _daysOfTheWeek = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
     private string[] _monthsOfTheYear = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
-    // private string _scheduleType
-    // {
-    //     get { return _schedule.Type.ToString(); }
-    //     set { _schedule.Type = Enum.Parse<ScheduleType>(value); }
-    // }
 
-    // private string[] _types = Enum.GetNames<ScheduleType>(); 
     private async Task HandleNewSchedule()
     {
-        _schedule = new Schedule() { Date = DateTime.Today };
+        _schedule = new Schedule() { StartDate = DateTime.Today };
         StateHasChanged();
         await _dataFormDialog!.Show(false);
     }
