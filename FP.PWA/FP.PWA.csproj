@@ -16,8 +16,4 @@
       <ProjectReference Include="..\FP.Models\FP.Models.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Components\" />
-    </ItemGroup>
-
 </Project>
