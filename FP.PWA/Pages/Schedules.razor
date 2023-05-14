@@ -11,10 +11,10 @@
 <MudPopover></MudPopover>
 
 <h3>Schedule</h3>
-@* <DataForm @ref="_dataFormDialog" Model="_schedule" IconUrl="/favicon.png" SubmitEventCallback="@HandleValidSubmit" CloseEventCallback="@DataFormDialog_OnDialogClose"> *@
-<DataDialog @ref="_dataDialog">
+<DataForm @ref="_dataFormDialog" Model="_schedule" IconUrl="/favicon.png" SubmitEventCallback="@HandleValidSubmit" CloseEventCallback="@DataFormDialog_OnDialogClose">
+@* <DataDialog @ref="_dataDialog"> *@
         <MudForm Model="@_schedule" @ref="@_mudFormDialog" ValidationDelay="0">
-            <MudSelect @bind-Value="_schedule!.Type" Label="Select occurence" HelperText="Frequency" TextChanged="@TypeChanged">
+            <MudSelect @bind-Value="_schedule!.Type" Label="Select occurence" HelperText="Frequency" >@*TextChanged="@TypeChanged">*@
                 @foreach (ScheduleType item in Enum.GetValues<ScheduleType>())
                 {
                     <MudSelectItem Value="@item">@item</MudSelectItem>
@@ -71,8 +71,8 @@
                 }
             </MudCard>
         </MudForm>
-</DataDialog>
-@* </DataForm> *@
+@* </DataDialog> *@
+</DataForm>
 
 <MudButton OnClick="HandleNewSchedule">Test</MudButton>
 
@@ -90,11 +90,11 @@
     {
         _schedule = new Schedule() { StartDate = DateTime.Today };
         StateHasChanged();
-        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
-        var parameters = new DialogParameters();
-        parameters.Add("ChildContent", _dataDialog?.ChildContent);
-        await DialogService.ShowAsync<DataDialog>("Edit this schedule", parameters, options);
-        // await _dataFormDialog!.Show(false);
+        // var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+        // var parameters = new DialogParameters();
+        // parameters.Add("ChildContent", _dataDialog?.ChildContent);
+        // await DialogService.ShowAsync<DataDialog>("Edit this schedule", parameters, options);
+        await _dataFormDialog!.Show(false);
     }
     
     // private async Task<IEnumerable<string>> Search1(string value)
@@ -119,8 +119,8 @@
 
     private void TypeChanged(string arg)
     {
-        _dataDialog?.RefreshDialog();
-        StateHasChanged();
+        // _dataDialog?.RefreshDialog();
+        // StateHasChanged();
     // throw new NotImplementedException();
     }
 
