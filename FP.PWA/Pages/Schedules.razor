@@ -119,6 +119,7 @@
 
     private void TypeChanged(string arg)
     {
+        _dataDialog?.RefreshDialog();
         StateHasChanged();
     // throw new NotImplementedException();
     }

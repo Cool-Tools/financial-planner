@@ -15,6 +15,11 @@
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
+    public void RefreshDialog()
+    {
+        this.ShouldRender();
+        this.StateHasChanged();
+    }
     void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
 }
