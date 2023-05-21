@@ -62,16 +62,18 @@
             @*         } *@
             @*     </MudSelect> *@
             @* } *@
-            <MudItem xs="4" Style="display:flex;">
-                <MudDatePicker Label="Start Date" @bind-Date="_schedule!.StartDate" For="@(() => _schedule!.StartDate)"/>
-            </MudItem>
-            <MudItem xs="4" Style="display:flex;">
-                @if (_schedule!.Type != ScheduleType.Once)
-                {
-                    <MudCheckBox @bind-Checked="@_hasEndDate" Style="width: 10%"></MudCheckBox>
-                    <MudDatePicker Disabled="@(!_hasEndDate)" Label="End Date" @bind-Date="_schedule!.EndDate" For="@(() => _schedule!.EndDate)"/>
-                }
-            </MudItem>
+            <MudGrid>
+                <MudItem xs="5" Style="display:flex;">
+                    <MudDatePicker Label="Start Date" @bind-Date="_schedule!.StartDate" For="@(() => _schedule!.StartDate)"/>
+                </MudItem>
+                <MudItem xs="7" Style="display:flex;">
+                    @if (_schedule!.Type != ScheduleType.Once)
+                    {
+                        <MudCheckBox @bind-Checked="@_hasEndDate"></MudCheckBox>
+                        <MudDatePicker Disabled="@(!_hasEndDate)" Label="End Date" @bind-Date="_schedule!.EndDate" For="@(() => _schedule!.EndDate)"/>
+                    }
+                </MudItem>
+            </MudGrid>
         </MudForm>
 @* </DataDialog> *@
 </DataForm>
