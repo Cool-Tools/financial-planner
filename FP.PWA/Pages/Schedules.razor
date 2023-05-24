@@ -2,6 +2,7 @@
 @using FP.PWA.Components
 @using Schedule =  FP.Models.Scheduling.Schedule
 @using FP.Models.Enumerations
+@using FP.Models.Scheduling
 @using FP.Models.StaticHelpers
 @using MudBlazor.Extensions
 @using MudBlazor.Components
@@ -46,22 +47,25 @@
                         <MudSelectItem T="string" Value="@month">@month</MudSelectItem>
                     }
                 </MudSelect>
-                <MudCheckBox @bind-Checked="@_daysSelected"></MudCheckBox>
-                <MudSelect T="string" Label="on" MultiSelection="true" @bind-Value="value" @bind-SelectedValues="_schedule!.Monthly!.DaysOfTheMonth" SelectAll="true">
+                <MudRadioGroup T="string" @bind-SelectedOption="monthlyType" @bind-Value="monthlyType">
+                    <MudRadio T="string" Value="Days">Days</MudRadio>
+                    <MudRadio T="string" Value="On">On</MudRadio>
+                </MudRadioGroup>
+                <p>Type = @monthlyType</p>
+                <MudSelect T="string" Label="on" MultiSelection="true" @bind-Value="value" @bind-SelectedValues="_schedule!.Monthly!.DaysOfTheMonth" SelectAll="true" Disabled="@(monthlyType == "On")">
                     @foreach (var day in _daysOfTheMonth)
                     {
                         <MudSelectItem T="string" Value="@day">@day</MudSelectItem>
                     }
                 </MudSelect>
-                <MudCheckBox @bind-Checked="@_onSelected"></MudCheckBox>
-                <MudSelect T="int" Label="on" bind-Value="valueInt" bind-SelectedValues="_schedule!.Monthly!.Nth" Disabled="@(_onSelected)" MultiSelection="true">
+                <MudSelect T="int" Label="on" bind-Value="valueInt" bind-SelectedValues="_schedule!.Monthly!.Nth" Disabled="@(monthlyType == "Days")" MultiSelection="true">
                     <MudSelectItem T="int" Value="0">1st</MudSelectItem>
                     <MudSelectItem T="int" Value="2">2nd</MudSelectItem>
                     <MudSelectItem T="int" Value="3">3rd</MudSelectItem>
                     <MudSelectItem T="int" Value="4">4th</MudSelectItem>
                     <MudSelectItem T="int" Value="-1">Last</MudSelectItem>
                 </MudSelect>
-                <MudSelect T="string" Label="days of the week" MultiSelection="true" @bind-Value="value" @bind-SelectedValues="_schedule.DaysOfTheWeek" Disabled="@(_onSelected)">
+                <MudSelect T="string" Label="days of the week" MultiSelection="true" @bind-Value="value" @bind-SelectedValues="_schedule.DaysOfTheWeek" Disabled="@(monthlyType == "Days")">
                     @foreach (var day in _daysOfTheWeek)
                     {
                         <MudSelectItem T="string" Value="@day">@day</MudSelectItem>
@@ -74,7 +78,7 @@
                 <hr/>
                 <MudGrid align-center>
                     <MudCheckBox @bind-Checked="@_hasEndDate"></MudCheckBox>
-                    <MudDatePicker Disabled="@(_hasEndDate)" Label="Expire" @bind-Date="_schedule!.EndDate" For="@(() => _schedule!.EndDate)"/>
+                    <MudDatePicker Disabled="@(!_hasEndDate)" Label="Expire" @bind-Date="_schedule!.EndDate" For="@(() => _schedule!.EndDate)"/>
                 </MudGrid>
             }
         </MudForm>
@@ -91,7 +95,8 @@
     private DataForm? _dataFormDialog;
     private DataDialog? _dataDialog;
     private MudForm? _mudFormDialog;
-    private int valueInt = 0;
+    private string monthlyType = "Days";
+    private int valueInt = 2;
     private string value { get; set; } = "Nothing selected";
     private string[] _daysOfTheWeek = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
     private string[] _monthsOfTheYear = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
@@ -99,7 +104,7 @@
 
     private async Task HandleNewSchedule()
     {
-        _schedule = new Schedule() { StartDate = DateTime.Today };
+        _schedule = new Schedule() { StartDate = DateTime.Today, Monthly = new MonthlySchedule()};
         _daysOfTheMonth.Add("Last");
         StateHasChanged();
         // var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
