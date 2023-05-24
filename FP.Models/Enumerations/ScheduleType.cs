@@ -6,7 +6,5 @@ public enum ScheduleType
     Daily,
     Weekly,
     Monthly,
-    Annually,
-    Nth,    //  For the nth (e.g. 3rd Thursday) of the month
     Custom
 }

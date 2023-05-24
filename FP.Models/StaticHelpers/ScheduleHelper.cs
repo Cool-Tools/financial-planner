@@ -7,11 +7,11 @@ public static class ScheduleHelper
     public static string ToSchedulePrompt(this ScheduleType scheduleType) => scheduleType switch
     {
         ScheduleType.Once => "Once",
-        ScheduleType.Annually => "Year(s)",
+        // ScheduleType.Annually => "Year(s)",
         ScheduleType.Monthly => "Month(s)",
         ScheduleType.Daily  => "Day(s)",
         ScheduleType.Weekly => "Week(s)",
-        ScheduleType.Nth => "",
+        // ScheduleType.Nth => "",
         ScheduleType.Custom => "",
         _ => throw new ArgumentOutOfRangeException(nameof(scheduleType), $"Unexpected scheduleType value: {scheduleType}")
     };

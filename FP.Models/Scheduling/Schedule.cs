@@ -10,8 +10,14 @@ public class Schedule
     public ScheduleType Type { get; set; }  //  How often this transaction repeats
     public SchedulingExceptionRulesCollection? SchedulingRules { get; set; }
     public int Every { get; set; } = 1; // describes how often (every 1 month, 2 weeks, etc)
-    public int Nth { get; set; } = 2;   //  holds the value for nth day e.g. 3rd Tuesday of the month
     public IEnumerable<string>? DaysOfTheWeek { get; set; }
-    // public IEnumerable<string>? MonthsOfTheYear { get; set; }
+    public MonthlySchedule? Monthly { get; set; }
 }
 
+public class MonthlySchedule
+{
+    public IEnumerable<string>? DaysOfTheMonth { get; set; }   //  holds the value for days of the months e.g. 1st, 5th, 25th, Last (32)
+    public IEnumerable<int>? Nth { get; set; }   //  holds the value for nth day e.g. 3rd Tuesday of the month
+    public IEnumerable<string>? MonthsOfTheYear { get; set; }
+    
+}
